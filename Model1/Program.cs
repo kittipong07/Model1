@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Model1.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,7 +9,13 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddDbContext<MapDbContext>(o =>
+o.UseSqlServer(
+builder.Configuration.GetConnectionString("MapDb")));
+
 var app = builder.Build();
+
+app.MapGet("/ping", (MapDbContext db) => db.Users.Count());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
