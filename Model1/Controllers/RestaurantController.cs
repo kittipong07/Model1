@@ -15,8 +15,28 @@ namespace Model1.Controllers
                 q = q.Where(x => x.RestaurantName!.Contains(restaurantName));
             if (!string.IsNullOrEmpty(restaurantType))
                 q = q.Where(x => x.RestaurantType == restaurantType);
+            int total = q.Count();
 
-            return ApiResult.Ok();
+            var rows = q.OrderBy(x => x.RestaurantId)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToList()
+                .Select(x => new
+                {
+                    x.RestaurantId,
+                    x.RestaurantName,
+                    x.Address,
+                    x.Phone,
+                    rating = x.Rating.ToString(),
+                    x.PriceRange,
+                    x.RestaurantType,
+                    x.ImageUrl,
+                    x.Description,
+                    distance = x.Distance.ToString(),
+                    bussinessType = "restaurant"
+                });
+
+            return ApiResult.Ok(new {total,rows});
         }
     }
 }
